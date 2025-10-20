@@ -8,6 +8,8 @@ export const products = sqliteTable('products', {
   imageUrl: text('image_url'),
   category: text('category'),
   brand: text('brand'),
+  badge: text('badge'),
+  badgeType: text('badge_type'),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(new Date()),
 });
