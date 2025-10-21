@@ -6,7 +6,7 @@ export default function SignUpPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center">
+      <div className="text-center ">
         <p className="text-sm text-dark-700">
           Already have an account?{" "}
           <Link href="/sign-in" className="font-medium text-dark-900 underline hover:no-underline">

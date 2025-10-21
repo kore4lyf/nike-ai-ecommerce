@@ -20,6 +20,44 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Database Schema
+
+This project uses a comprehensive PostgreSQL database schema built with Drizzle ORM. The schema includes:
+
+### Core Entities
+- **Products** - Main product information
+- **Product Variants** - Size, color, and stock variations
+- **Categories** - Product categorization (with hierarchical support)
+- **Brands** - Product brands
+- **Collections** - Curated product collections
+
+### Filters
+- **Genders** - Gender-specific categorization
+- **Colors** - Color options with hex codes
+- **Sizes** - Size options with sort ordering
+
+### User Management
+- **Addresses** - Shipping and billing addresses
+- **Reviews** - Product reviews and ratings
+
+### E-commerce Functionality
+- **Carts** - Shopping carts for registered and guest users
+- **Orders** - Order management with status tracking
+- **Payments** - Payment processing records
+- **Coupons** - Discount codes and promotions
+- **Wishlists** - User wishlists
+
+### Relationships
+- **Product Collections** - Many-to-many relationships between products and collections
+
+## Database Setup
+
+1. Set up a PostgreSQL database (we recommend [Neon](https://neon.tech/))
+2. Set the `DATABASE_URL` environment variable
+3. Generate migrations: `npm run db:generate`
+4. Apply migrations: `npm run db:migrate`
+5. Seed the database: `npm run db:seed`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
