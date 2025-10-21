@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "ask": [
+      "Read(!/mnt/c/Users/akfal/Documents/ecommerce/nike-ai-ecommerce/**)",
+      "Edit(!/mnt/c/Users/akfal/Documents/ecommerce/nike-ai-ecommerce/**)"
+    ],
+    "allow": [
+      "Read(/mnt/c/Users/akfal/Documents/ecommerce/nike-ai-ecommerce/**)",
+      "Edit(/mnt/c/Users/akfal/Documents/ecommerce/nike-ai-ecommerce/**)"
+    ]
+  },
+  "memoryImport": {},
+  "monitoring": {}
+}
