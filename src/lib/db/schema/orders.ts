@@ -2,7 +2,10 @@ import { pgTable, uuid, varchar, numeric, timestamp, foreignKey } from 'drizzle-
 import { sql } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { relations } from 'drizzle-orm';
 import { addresses } from './addresses';
+import { orderItems } from './orderItems';
+import { payments } from './payments';
 
 // Define the order status enum
 export const orderStatusEnum = {
@@ -16,7 +19,7 @@ export const orderStatusEnum = {
 export const orders = pgTable('orders', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').notNull(), // Assuming there's a user table with id column
-  status: varchar('status', { length: 20, enum: Object.values(orderStatusEnum) }).notNull().default(orderStatusEnum.PENDING),
+  status: varchar('status', { length: 20 }).notNull().default('pending'),
   totalAmount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
   shippingAddressId: uuid('shipping_address_id').notNull(),
   billingAddressId: uuid('billing_address_id').notNull(),
@@ -43,7 +46,7 @@ export const orders = pgTable('orders', {
 // Schema for inserting an order - can be used to validate API requests
 export const insertOrderSchema = createInsertSchema(orders, {
   userId: z.string().uuid(),
-  status: z.enum(Object.values(orderStatusEnum) as [string, ...string[]]),
+  status: z.enum(['pending', 'paid', 'shipped', 'delivered', 'cancelled']),
   totalAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
   shippingAddressId: z.string().uuid(),
   billingAddressId: z.string().uuid(),
@@ -56,3 +59,28 @@ export const selectOrderSchema = createSelectSchema(orders);
 export type Order = z.infer<typeof selectOrderSchema>;
 export type NewOrder = z.infer<typeof insertOrderSchema>;
 export type OrderStatus = typeof orderStatusEnum[keyof typeof orderStatusEnum];
+
+// Relations
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  // Note: We're not adding relations to user here since we don't have the user table definition
+  // In a real implementation, you would add:
+  // user: one(users, {
+  //   fields: [orders.userId],
+  //   references: [users.id],
+  // }),
+  billingAddress: one(addresses, {
+    fields: [orders.billingAddressId],
+    references: [addresses.id],
+    relationName: 'billingAddress'
+  }),
+  shippingAddress: one(addresses, {
+    fields: [orders.shippingAddressId],
+    references: [addresses.id],
+    relationName: 'shippingAddress'
+  }),
+  orderItems: many(orderItems),
+  payment: one(payments, {
+    fields: [orders.id],
+    references: [payments.orderId]
+  })
+}));

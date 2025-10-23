@@ -2,10 +2,10 @@ import { pgTable, uuid, varchar, text, boolean, timestamp, foreignKey, numeric }
 import { sql } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { relations } from 'drizzle-orm';
 import { categories } from './categories';
 import { brands } from './brands';
 import { genders } from './filters/genders';
-import { variants } from './variants';
 
 export const products = pgTable('products', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -32,10 +32,11 @@ export const products = pgTable('products', {
       columns: [table.brandId],
       foreignColumns: [brands.id],
     }).onDelete('cascade'),
-    defaultVariantFk: foreignKey({
-      columns: [table.defaultVariantId],
-      foreignColumns: [variants.id],
-    }).onDelete('set null'),
+    // Note: defaultVariantFk is commented out to avoid circular dependency
+    // defaultVariantFk: foreignKey({
+    //   columns: [table.defaultVariantId],
+    //   foreignColumns: [variants.id],
+    // }).onDelete('set null'),
   };
 });
 
@@ -56,3 +57,21 @@ export const selectProductSchema = createSelectSchema(products);
 // Type types extracted from the schemas
 export type Product = z.infer<typeof selectProductSchema>;
 export type NewProduct = z.infer<typeof insertProductSchema>;
+
+// Relations
+export const productsRelations = relations(products, ({ one, many }) => ({
+  category: one(categories, {
+    fields: [products.categoryId],
+    references: [categories.id]
+  }),
+  gender: one(genders, {
+    fields: [products.genderId],
+    references: [genders.id]
+  }),
+  brand: one(brands, {
+    fields: [products.brandId],
+    references: [brands.id]
+  })
+  // Note: Other relations are commented out to avoid circular dependencies
+  // We'll define them in the variants, images, etc. files instead
+}));

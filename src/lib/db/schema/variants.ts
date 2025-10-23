@@ -2,9 +2,13 @@ import { pgTable, uuid, varchar, numeric, integer, jsonb, timestamp, foreignKey 
 import { sql } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { relations } from 'drizzle-orm';
 import { products } from './products';
 import { colors } from './filters/colors';
 import { sizes } from './filters/sizes';
+import { productImages } from './images';
+import { cartItems } from './cartItems';
+import { orderItems } from './orderItems';
 
 export const variants = pgTable('product_variants', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -58,3 +62,46 @@ export const selectVariantSchema = createSelectSchema(variants);
 // Type types extracted from the schemas
 export type Variant = z.infer<typeof selectVariantSchema>;
 export type NewVariant = z.infer<typeof insertVariantSchema>;
+
+// Relations
+export const variantsRelations = relations(variants, ({ one, many }) => ({
+  product: one(products, {
+    fields: [variants.productId],
+    references: [products.id],
+    relationName: 'defaultVariant'
+  }),
+  color: one(colors, {
+    fields: [variants.colorId],
+    references: [colors.id]
+  }),
+  size: one(sizes, {
+    fields: [variants.sizeId],
+    references: [sizes.id]
+  }),
+  images: many(productImages),
+  cartItems: many(cartItems),
+  orderItems: many(orderItems)
+}));
+// Type types extracted from the schemas
+export type Variant = z.infer<typeof selectVariantSchema>;
+export type NewVariant = z.infer<typeof insertVariantSchema>;
+
+// Relations
+export const variantsRelations = relations(variants, ({ one, many }) => ({
+  product: one(products, {
+    fields: [variants.productId],
+    references: [products.id],
+    relationName: 'defaultVariant'
+  }),
+  color: one(colors, {
+    fields: [variants.colorId],
+    references: [colors.id]
+  }),
+  size: one(sizes, {
+    fields: [variants.sizeId],
+    references: [sizes.id]
+  }),
+  images: many(productImages),
+  cartItems: many(cartItems),
+  orderItems: many(orderItems)
+}));
